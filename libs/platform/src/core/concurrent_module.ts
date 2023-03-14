@@ -11,30 +11,28 @@ import type { Thread } from './thread.js'
 export class ConcurrentModule<T> implements IConcurrentModule<T> {
   constructor(private pool: ThreadPool, private src: string) {}
 
-  async load() {
+  async load(): Promise<T> {
     const moduleSrc = this.src
     const module = await import(this.src)
     const thread = await this.pool.getThread()
 
     const cache = {}
     return new Proxy(module, {
-      get(module, exportName) {
-        const _export = Reflect.get(module, exportName)
+      get(obj, key) {
+        const _export = Reflect.get(obj, key)
 
-        if (!Reflect.has(module, exportName)) return
-        else if (!isFunction(_export)) throw new ConcurrencyError(ErrorMessage.NonFunctionLoad)
+        if (!Reflect.has(obj, key)) return
+        else if (!isFunction(_export)) throw new ConcurrencyError(ErrorMessage.NotAccessibleExport)
         else {
-          if (!Reflect.has(cache, exportName))
-            Reflect.set(cache, exportName, createFunctionProxy(thread, moduleSrc, _export))
-
-          return Reflect.get(cache, exportName)
+          if (!Reflect.has(cache, key)) Reflect.set(cache, key, createThreadedFunction(thread, moduleSrc, _export))
+          return Reflect.get(cache, key)
         }
       }
     })
   }
 }
 
-function createFunctionProxy(
+function createThreadedFunction(
   thread: Thread,
   moduleSrc: string,
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -70,7 +68,7 @@ function createFunctionProxy(
     },
 
     construct(target, args) {
-      return createObjectProxy(thread, moduleSrc, target.name, args)
+      return createThreadedObject(thread, moduleSrc, target.name, args)
     },
 
     apply(_target, _thisArg, args) {
@@ -79,7 +77,7 @@ function createFunctionProxy(
   })
 }
 
-async function createObjectProxy(thread: Thread, moduleSrc: string, exportName: string, args: unknown[]) {
+async function createThreadedObject(thread: Thread, moduleSrc: string, exportName: string, args: unknown[]) {
   const threadedObject = await ThreadedObject.create(thread, moduleSrc, exportName, args)
 
   return new Proxy(threadedObject.target, {

@@ -1,3 +1,7 @@
+## v0.5.14
+
+- concurrent.module is renamed to concurrent.import.
+
 ## v0.5.13
 
 - Unit tests are implemented for some of the platform core classes.

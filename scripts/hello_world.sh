@@ -10,7 +10,7 @@ import { concurrent } from '@bitair/concurrent.js'
 // Import it as usual to see the difference.
 // import { factorial } from 'extra-bigint'
 
-const { factorial } = await concurrent.module('extra-bigint').load()
+const { factorial } = await concurrent.import('extra-bigint').load()
 
 // This would indicate whether the main process is blocked or not while calculating the n factorial.
 const progress = setInterval(() => process.stdout.write('⯀'), 100)

@@ -28,7 +28,7 @@ var ErrorMessage = {
   WorkerNotSupported: { code: 507, text: "This browser doesn't support web workers." },
   ThreadAllocationTimeout: { code: 508, text: "Thread allocation failed due to timeout." },
   MethodAssignment: { code: 509, text: "Can't assign a method." },
-  NonFunctionLoad: { code: 510, text: "Can't load an export of type '%{0}'." },
+  NotAccessibleExport: { code: 510, text: "Can't access an export of type '%{0}'. Only top level functions and classes are imported." },
   ThreadPoolTerminated: { code: 511, text: "Thread pool has been terminated." },
   ThreadTerminated: { code: 512, text: "Thread has been terminated." }
 };

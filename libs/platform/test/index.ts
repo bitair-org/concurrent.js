@@ -16,7 +16,7 @@ concurrent.config({
   maxThreads: 2
 })
 
-const services = await concurrent.module<typeof sampleServices>(SERVICES_SRC).load()
+const services = await concurrent.import<typeof sampleServices>(SERVICES_SRC).load()
 
 describe('Testing Node.js platform ', () => {
   before(async () => {
@@ -49,7 +49,7 @@ describe('Testing Node.js platform ', () => {
     } catch (_error) {
       error = _error
     }
-    expect((error as ConcurrencyError).code).equal(ErrorMessage.NonFunctionLoad.code)
+    expect((error as ConcurrencyError).code).equal(ErrorMessage.NotAccessibleExport.code)
   })
 
   it('should invoke an exported function', async () => {
@@ -203,7 +203,7 @@ describe('Testing Node.js platform ', () => {
   it('should run multiple functions in parallel', async () => {
     const ops: Promise<boolean>[] = []
     for (let i = 0; i < cpus().length * 20; i++) {
-      const services = await concurrent.module<typeof sampleServices>(SERVICES_SRC).load()
+      const services = await concurrent.import<typeof sampleServices>(SERVICES_SRC).load()
 
       ops.push(Promise.resolve(services.isPrime(i)))
     }
@@ -218,7 +218,7 @@ describe('Testing Node.js platform ', () => {
   it('should run multiple instance methods in parallel', async () => {
     const ops: Promise<boolean>[] = []
     for (let i = 0; i < cpus().length * 20; i++) {
-      const services = await concurrent.module<typeof sampleServices>(SERVICES_SRC).load()
+      const services = await concurrent.import<typeof sampleServices>(SERVICES_SRC).load()
 
       const obj = await new services.SampleObject()
       expect(await obj.isWorker).true
@@ -246,7 +246,7 @@ describe('Testing Node.js platform ', () => {
   it('should be disabled when the disabled flag is on', async () => {
     concurrent.config({ disabled: true })
 
-    const services = await concurrent.module<typeof sampleServices>(SERVICES_SRC).load()
+    const services = await concurrent.import<typeof sampleServices>(SERVICES_SRC).load()
     const obj = await new services.SampleObject([1])
 
     expect(await obj.isWorker).false

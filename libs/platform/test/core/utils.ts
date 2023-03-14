@@ -49,6 +49,16 @@ describe('Testing Utils', () => {
     }
   })
 
+  it('isObject', () => {
+    for (const key in SAMPLE_VALUES) {
+      if (Object.prototype.hasOwnProperty.call(SAMPLE_VALUES, key)) {
+        const value = SAMPLE_VALUES[key]
+        if (key === 'object' || key === 'null') expect(Utils.isObject(value)).true
+        else expect(Utils.isObject(value)).false
+      }
+    }
+  })
+
   it('isFunction', () => {
     for (const key in SAMPLE_VALUES) {
       if (Object.prototype.hasOwnProperty.call(SAMPLE_VALUES, key)) {

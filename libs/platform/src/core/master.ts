@@ -26,14 +26,14 @@ export class Master implements IConcurrent {
     if (this.started) (this.pool as ThreadPool).config(this.settings)
   }
 
-  module<T>(moduleSrc: string | URL): IConcurrentModule<T> {
+  import<T>(moduleSrc: string | URL): IConcurrentModule<T> {
     if (!this.settings.disabled && !this.started) this.start()
 
     const module = this.settings.disabled
       ? {
           load: () => import(moduleSrc.toString())
         }
-      : new ConcurrentModule(this.pool as ThreadPool, moduleSrc.toString())
+      : new ConcurrentModule<T>(this.pool as ThreadPool, moduleSrc.toString())
 
     return module
   }

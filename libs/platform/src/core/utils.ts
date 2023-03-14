@@ -31,6 +31,10 @@ export function isFunction(val: unknown) {
   return typeof val === 'function'
 }
 
+export function isObject(val: unknown) {
+  return typeof val === 'object'
+}
+
 export function format(str: string, args: unknown[]) {
   for (let i = 0; i < args.length; i++) {
     str = str.replace(`%{${i}}`, args[i] as string)

@@ -92,7 +92,7 @@ var ErrorMessage = {
   WorkerNotSupported: { code: 507, text: "This browser doesn't support web workers." },
   ThreadAllocationTimeout: { code: 508, text: "Thread allocation failed due to timeout." },
   MethodAssignment: { code: 509, text: "Can't assign a method." },
-  NonFunctionLoad: { code: 510, text: "Can't load an export of type '%{0}'." },
+  NotAccessibleExport: { code: 510, text: "Can't access an export of type '%{0}'. Only top level functions and classes are imported." },
   ThreadPoolTerminated: { code: 511, text: "Thread pool has been terminated." },
   ThreadTerminated: { code: 512, text: "Thread has been terminated." }
 };
@@ -281,22 +281,22 @@ var ConcurrentModule = class {
     const thread = await this.pool.getThread();
     const cache = {};
     return new Proxy(module2, {
-      get(module3, exportName) {
-        const _export = Reflect.get(module3, exportName);
-        if (!Reflect.has(module3, exportName))
+      get(obj, key) {
+        const _export = Reflect.get(obj, key);
+        if (!Reflect.has(obj, key))
           return;
         else if (!isFunction(_export))
-          throw new ConcurrencyError(ErrorMessage.NonFunctionLoad);
+          throw new ConcurrencyError(ErrorMessage.NotAccessibleExport);
         else {
-          if (!Reflect.has(cache, exportName))
-            Reflect.set(cache, exportName, createFunctionProxy(thread, moduleSrc, _export));
-          return Reflect.get(cache, exportName);
+          if (!Reflect.has(cache, key))
+            Reflect.set(cache, key, createThreadedFunction(thread, moduleSrc, _export));
+          return Reflect.get(cache, key);
         }
       }
     });
   }
 };
-function createFunctionProxy(thread, moduleSrc, target) {
+function createThreadedFunction(thread, moduleSrc, target) {
   const threadedFunction = new ThreadedFunction(thread, moduleSrc, target.name);
   return new Proxy(target, {
     get(target2, key) {
@@ -327,14 +327,14 @@ function createFunctionProxy(thread, moduleSrc, target) {
       }
     },
     construct(target2, args) {
-      return createObjectProxy(thread, moduleSrc, target2.name, args);
+      return createThreadedObject(thread, moduleSrc, target2.name, args);
     },
     apply(_target, _thisArg, args) {
       return threadedFunction.invoke(args);
     }
   });
 }
-async function createObjectProxy(thread, moduleSrc, exportName, args) {
+async function createThreadedObject(thread, moduleSrc, exportName, args) {
   const threadedObject = await ThreadedObject.create(thread, moduleSrc, exportName, args);
   return new Proxy(threadedObject.target, {
     get(target, key) {
@@ -518,7 +518,7 @@ var Master = class {
     if (this.started)
       this.pool.config(this.settings);
   }
-  module(moduleSrc) {
+  import(moduleSrc) {
     if (!this.settings.disabled && !this.started)
       this.start();
     const module2 = this.settings.disabled ? {

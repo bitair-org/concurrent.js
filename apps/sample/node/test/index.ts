@@ -6,7 +6,7 @@ let Math: typeof MathModule
 
 describe('Testing Node Sample', () => {
   before(async () => {
-    Math = await concurrent.module<typeof MathModule>('extra-bigint').load()
+    Math = await concurrent.import<typeof MathModule>('extra-bigint').load()
   })
 
   after(async () => {

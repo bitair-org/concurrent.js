@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@bitair/concurrent.js",
-  "version": "0.5.13",
+  "version": "0.5.14",
   "description": "Easy Multithreading for JavaScript (Node.js, Deno & Browser)",
   "main": "src/node/index.js",
   "browser": "src/browser/index.js",
