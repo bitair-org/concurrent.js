@@ -1,4 +1,4 @@
-[`CHANGE LOG`](./CHANGE.md) [`STAR HISTORY`](https://star-history.com/#bitair-org/concurrent.js&Timeline) [`CHANNEL`](https://www.reddit.com/r/concurrentjs/) [`DONATE`](https://donate.depay.com/72pFCdavyPyVZ0XALzLVC)
+[`CHANGE LOG`](./CHANGE.md) [`STAR HISTORY`](https://star-history.com/#bitair-org/concurrent.js&Timeline) [`CHANNEL`](https://www.reddit.com/r/concurrentjs/)
 
 # Intro
 
